@@ -5,7 +5,7 @@ from tensorflow.keras.models import load_model
 import numpy as np
 
 # Cargar el modelo desde el archivo
-model = load_model("char_recognizer_model.keras")
+model = load_model("char_recognizer_model_ffnn.keras")
 
 
 def predict_digit(image_array):

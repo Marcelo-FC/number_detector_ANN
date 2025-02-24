@@ -5,8 +5,12 @@ Controller:
         id: text_input
         size_hint_y: 0.1
         text: 'Placeholder text'
+        font_size: '32sp'          # Increase font size
+        halign: 'center'           # Horizontal alignment
+        valign: 'middle'           # Vertical alignment (requires multiline)
+        multiline: False           # Ensure single-line for vertical centering
+        readonly: True             # Make it read-only if it's just for display
+
     PaintWidget:
         id: paint_canvas
         size_hint_y: 0.8
-        
-        
