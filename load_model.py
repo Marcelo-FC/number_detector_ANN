@@ -3,8 +3,12 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 from tensorflow.keras.models import load_model
 import numpy as np
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+model_path = os.path.join(base_dir, 'char_recognizer_emnist_cnn.keras')
+
 # Load the trained model
-model = load_model("char_recognizer_emnist_cnn.keras")
+model =load_model(model_path)
 
 # Mapping for EMNIST ByClass (0–9, A–Z, a–z)
 emnist_classes = [
