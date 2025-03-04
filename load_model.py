@@ -5,7 +5,7 @@ import numpy as np
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-model_path = os.path.join(base_dir, 'char_recognizer_emnist_cnn.keras')
+model_path = os.path.join(base_dir, 'char_recognizer_emnist_cnn.h5')
 
 # Load the trained model
 model =load_model(model_path)
