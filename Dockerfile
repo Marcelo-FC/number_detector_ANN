@@ -1,31 +1,29 @@
-# Use Python 3.9 as the base image
-FROM python:3.9
+# Use the slim version of Python 3.9
+FROM python:3.9-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt . 
-RUN apt-get update && apt-get install -y libgl1-mesa-glx curl && rm -rf /var/lib/apt/lists/*
-RUN pip install -r requirements.txt
+# Install required system dependencies manually
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+# Copy only requirements first to leverage Docker cache
+COPY requirements.txt .
 
-# Install Bootstrap locally via npm
-RUN npm install bootstrap@5.3.0
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure the static folder exists and copy Bootstrap files there
-RUN mkdir -p /app/static/css /app/static/js && \
-    cp node_modules/bootstrap/dist/css/bootstrap.min.css /app/static/css/bootstrap.min.css && \
-    cp node_modules/bootstrap/dist/js/bootstrap.bundle.min.js /app/static/js/bootstrap.bundle.min.js
+# Ensure the static folder exists
+RUN mkdir -p /app/static
 
 # Copy the rest of the application files
 COPY . .
 
-# Expose port 8000 for Django's development server
+# Expose port 8000 for Django
 EXPOSE 8000
 
-# Start the Django application
+# Start Django application
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
