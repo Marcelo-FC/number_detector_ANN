@@ -1,7 +1,7 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import numpy as np
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite  # ✅ Use tflite-runtime!
 
 # ✅ Load the TFLite FP16 model
 model_path = "char_recognizer_model_ffnn_fp16.tflite"
@@ -9,7 +9,7 @@ if not os.path.exists(model_path):
     raise FileNotFoundError(f"❌ TFLite model not found: {model_path}")
 
 print(f"✅ Loading TFLite model from {model_path}...")
-interpreter = tf.lite.Interpreter(model_path=model_path)
+interpreter = tflite.Interpreter(model_path=model_path)  # Use tflite runtime interpreter
 interpreter.allocate_tensors()
 print("✅ TFLite model loaded and allocated successfully!")
 
@@ -26,7 +26,7 @@ def predict_digit(image_array):
     """
 
     # Ensure correct type and shape
-    image_array = image_array.astype(np.float32)  # TFLite works with float32 inputs, even for fp16 models
+    image_array = image_array.astype(np.float32)  # TFLite expects float32 even for FP16
 
     # Set input tensor
     interpreter.set_tensor(input_details[0]['index'], image_array)

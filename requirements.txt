@@ -1,4 +1,6 @@
 opencv-python-headless
-tensorflow
+tflite-runtime
 django
 Pillow
+numpy<2.0.0
+scipy  # ✅ Required for center_of_mass

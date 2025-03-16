@@ -22,3 +22,12 @@ char_recognizer_model_ffnn.keras
 char_recognizer_emnist_cnn.h5
 char_recognizer_emnist_cnn.keras
 char_recognizer_model_ffnn.tflite
+convert.py
+tensorflow_check.py
+handwrite.kv
+main.py
+convert_to_tf_lite.py
+train_model.py
+test_model.py
+test_tf_lite.py
+setup.txt
