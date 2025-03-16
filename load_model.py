@@ -1,31 +1,43 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from tensorflow.keras.models import load_model
 import numpy as np
+import tensorflow as tf
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+# ✅ Load the TFLite FP16 model
+model_path = "char_recognizer_model_ffnn_fp16.tflite"
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"❌ TFLite model not found: {model_path}")
 
-model_path = os.path.join(base_dir, 'char_recognizer_emnist_cnn.h5')
+print(f"✅ Loading TFLite model from {model_path}...")
+interpreter = tf.lite.Interpreter(model_path=model_path)
+interpreter.allocate_tensors()
+print("✅ TFLite model loaded and allocated successfully!")
 
-# Load the trained model
-model =load_model(model_path)
+# Get input and output details
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
-# Mapping for EMNIST ByClass (0–9, A–Z, a–z)
-emnist_classes = [
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
-    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 
-    'U', 'V', 'W', 'X', 'Y', 'Z',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
-    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
-    'u', 'v', 'w', 'x', 'y', 'z'
-]
 
+# ✅ Function to predict digit from image array
 def predict_digit(image_array):
-    # Predict class index
-    predictions = model.predict(image_array)
-    predicted_index = np.argmax(predictions)
+    """
+    Receives a (1, 28, 28) preprocessed grayscale image array.
+    Returns the predicted digit as a string.
+    """
 
-    # Map index to character
-    predicted_char = emnist_classes[predicted_index]
-    return predicted_char
+    # Ensure correct type and shape
+    image_array = image_array.astype(np.float32)  # TFLite works with float32 inputs, even for fp16 models
+
+    # Set input tensor
+    interpreter.set_tensor(input_details[0]['index'], image_array)
+
+    # Run inference
+    interpreter.invoke()
+
+    # Get output tensor (probabilities for digits 0-9)
+    output = interpreter.get_tensor(output_details[0]['index'])
+
+    # Get digit with highest probability
+    predicted_digit = np.argmax(output)
+
+    return str(predicted_digit)

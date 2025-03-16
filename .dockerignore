@@ -8,6 +8,9 @@ __pycache__/
 .conda/
 env/
 venv/
+.vscode/
+debug/
+
 
 
 # Ignore other unnecessary files
@@ -15,3 +18,7 @@ venv/
 .gitignore
 .DS_Store
 node_modules/
+char_recognizer_model_ffnn.keras
+char_recognizer_emnist_cnn.h5
+char_recognizer_emnist_cnn.keras
+char_recognizer_model_ffnn.tflite

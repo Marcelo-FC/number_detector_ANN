@@ -1,8 +1,9 @@
 import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import numpy as np
-from scipy.io import loadmat
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+from tensorflow.keras import datasets
 import matplotlib.pyplot as plt
 
 # Enable dynamic memory growth for GPU
@@ -16,32 +17,28 @@ if gpus:
         print(e)
 
 # Load the trained model
-model_path = "char_recognizer_emnist_cnn.keras"
+model_path = "char_recognizer_model_ffnn.keras"
 print(f"Loading model from {model_path}...")
 model = load_model(model_path)
 
-# Load EMNIST ByClass test data
-emnist_path = os.path.expanduser("~/.emnist/matlab/emnist-byclass.mat")
-print(f"Loading EMNIST data from {emnist_path}...")
-data = loadmat(emnist_path)
-
-# Extract test images and labels
-x_test = data['dataset']['test'][0, 0]['images'][0, 0]
-y_test = data['dataset']['test'][0, 0]['labels'][0, 0].flatten()
+# Load MNIST test data
+print("Loading MNIST test data...")
+(_, _), (x_test, y_test) = datasets.mnist.load_data()
 
 # Preprocess test data
-x_test = x_test.reshape((-1, 28, 28, 1), order='F') / 255.0  # 'F' for MATLAB format
+x_test = x_test / 255.0  # Normalize to 0-1
+x_test = x_test.reshape((-1, 28, 28))  # Keep shape as (28, 28) since model expects Flatten
 
 # Evaluate model on test data
 loss, accuracy = model.evaluate(x_test, y_test)
 print(f"Test Loss: {loss:.4f}, Test Accuracy: {accuracy:.4f}")
 
-# Map labels to characters (0-9, A-Z, a-z)
-label_map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+# Map labels to characters (0-9)
+label_map = "0123456789"
 
 # Function to display image and prediction
 def display_prediction(image, true_label, pred_label):
-    plt.imshow(image.squeeze(), cmap='gray')
+    plt.imshow(image, cmap='gray')
     plt.title(f"True: {label_map[true_label]} | Pred: {label_map[pred_label]}")
     plt.axis('off')
     plt.show()
@@ -53,7 +50,7 @@ indices = np.random.choice(len(x_test), num_samples, replace=False)
 for idx in indices:
     img = x_test[idx]
     true_label = y_test[idx]
-    pred = model.predict(np.expand_dims(img, axis=0))
+    pred = model.predict(np.expand_dims(img, axis=0))  # Model expects batch dimension
     pred_label = np.argmax(pred)
 
     display_prediction(img, true_label, pred_label)
