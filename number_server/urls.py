@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/',canvas_views.home,name="canvas_views"),
+    path('',canvas_views.home,name="canvas_views"),
     path('process_image/', canvas_views.process_image, name="process_image"),
 ]
 if settings.DEBUG:
